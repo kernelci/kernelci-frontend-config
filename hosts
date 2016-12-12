@@ -1,7 +1,12 @@
 [local]
 kernelci-frontend
 
-[all]
+[dev]
+staging.kernelci.org
+
+[prod]
 kernelci.org
-status.armcloud.us
-staging.status.armcloud.us
+
+[all:children]
+prod
+dev
