@@ -32,7 +32,7 @@
     - install
 
 - name: Add redis PPA (Ubuntu)
-  apt_repository: repo='ppa:rwky/redis'
+  apt_repository: repo='ppa:chris-lea/redis-server'
                   update_cache=yes
   when: ansible_lsb.id == "Ubuntu"
   tags:
