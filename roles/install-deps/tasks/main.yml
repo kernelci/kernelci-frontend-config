@@ -1,5 +1,6 @@
 ---
 - name: Install OS dependencies
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
   apt:  pkg={{ item }}
         state=latest
         update_cache=yes
@@ -21,6 +22,7 @@
   when: ansible_distribution == "Ubuntu"
 
 - name: Install nginx
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
   apt:  pkg={{ item }}
         state=latest
         update_cache=yes
@@ -41,6 +43,7 @@
 
 - name: Install redis server
   apt: pkg=redis-server
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
   tags:
     - install
     - redis
