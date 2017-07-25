@@ -18,7 +18,7 @@
 
 - name: Add nginx stable PPA repository
   apt_repository: repo='ppa:nginx/stable'
-  when: ansible_lsb.id == "Ubuntu"
+  when: ansible_distribution == "Ubuntu"
 
 - name: Install nginx
   apt:  pkg={{ item }}
@@ -34,7 +34,7 @@
 - name: Add redis PPA (Ubuntu)
   apt_repository: repo='ppa:chris-lea/redis-server'
                   update_cache=yes
-  when: ansible_lsb.id == "Ubuntu"
+  when: ansible_distribution == "Ubuntu"
   tags:
     - install
     - redis
