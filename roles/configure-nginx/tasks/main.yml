@@ -32,14 +32,14 @@
 # we better run the node.js command locally and upload the file.
 - name: Copy static assests (for staging)
   command: rsync -a -u {{ install_base }}/{{ hostname }}/app/dashboard/static/ {{ web_root }}/{{ hostname }}/static
-  when: ansible_lsb.id == "Ubuntu"
+  when: ansible_distribution == "Ubuntu"
   tags:
     - web-server
     - app
 
 - name: Build static assets
   command: nodejs {{ install_base }}/{{ hostname }}/app/dashboard/static/js/lib/r.js -o {{ install_base }}/{{ hostname }}/app/dashboard/static/js/build.js
-  when: ansible_lsb.id == "Debian"
+  when: ansible_distribution == "Debian"
   tags:
     - web-server
     - app
@@ -50,14 +50,14 @@
         recurse=yes
         owner={{ app_user }}
         group={{ app_user }}
-  when: ansible_lsb.id == "Debian"
+  when: ansible_distribution == "Debian"
   tags:
     - web-server
     - app
 
 - name: Copy static assets
   command: rsync -a -u /tmp/assets-build/ {{ web_root }}/{{ hostname }}/static
-  when: ansible_lsb.id == "Debian"
+  when: ansible_distribution == "Debian"
   tags:
     - web-server
     - app
