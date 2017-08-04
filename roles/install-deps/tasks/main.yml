@@ -17,6 +17,28 @@
   tags:
     - install
 
+- name: Install EPEL7
+  yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+  tags:
+    - install
+
+- name: Install OS deps
+  when: ansible_distribution == "CentOS"
+  yum: name={{ item }}
+  with_items:
+    - git
+    - libselinux-python
+    - python-virtualenv
+    - gcc
+    - rsync
+    - nodejs
+    - uwsgi
+    - uwsgi-plugin-python
+  tags:
+    - install
+
 - name: Add nginx stable PPA repository
   apt_repository: repo='ppa:nginx/stable'
   when: ansible_distribution == "Ubuntu"
@@ -30,6 +52,12 @@
     - nginx
     - nginx-extras
     - rsync
+  tags:
+    - install
+
+- name: Install nginx
+  when: ansible_distribution == "CentOS"
+  yum: name=nginx
   tags:
     - install
 
@@ -48,8 +76,26 @@
     - install
     - redis
 
+- name: Install redis server
+  when: ansible_distribution == "CentOS"
+  yum: name=redis
+  tags:
+    - install
+    - redis
+
+- name: set redis_service fact for CentOS
+  when: ansible_distribution == "CentOS"
+  set_fact:
+    redis_service: "redis"
+
+- name: set redis_service fact for Debian
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+  set_fact:
+    redis_service: "redis-server"
+
+
 - name: Make sure redis is running
-  service:  name=redis-server
+  service:  name={{ redis_service }}
             state=started
   tags:
     - install
