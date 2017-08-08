@@ -151,6 +151,7 @@
     - web-server
 
 - name: Install uwsgi configuration file
+  when: ansible_distribution == "Debian"
   template: src=kernelci-frontend.ini
             dest=/etc/uwsgi/apps-available/kernelci-frontend.ini
             owner=root
@@ -162,11 +163,24 @@
     - web-server
 
 - name: Enable uwsgi frontend application
+  when: ansible_distribution == "Debian"
   file: state=link
         src=/etc/uwsgi/apps-available/kernelci-frontend.ini
         dest=/etc/uwsgi/apps-enabled/kernelci-frontend.ini
         owner=root
         group=root
+  notify:
+    - reload-uwsgi
+  tags:
+    - web-server
+
+- name: Enable uwsgi frontend application
+  when: ansible_distribution == "CentOS"
+  template: src=kernelci-frontend.ini
+                dest=/etc/uwsgi.d/kernelci-frontend.ini
+        owner={{ app_user }}
+        group={{ app_user }}
+        mode=0640
   notify:
     - reload-uwsgi
   tags:
