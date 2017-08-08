@@ -44,6 +44,13 @@
     - web-server
     - app
 
+- name: Build static assets
+  command: node {{ install_base }}/{{ hostname }}/app/dashboard/static/js/lib/r.js -o {{ install_base }}/{{ hostname }}/app/dashboard/static/js/build.js
+  when: ansible_distribution == "CentOS"
+  tags:
+    - web-server
+    - app
+
 - name: Fix assets permissions
   file: path=/tmp/assets-build
         state=directory
@@ -57,7 +64,7 @@
 
 - name: Copy static assets
   command: rsync -a -u /tmp/assets-build/ {{ web_root }}/{{ hostname }}/static
-  when: ansible_distribution == "Debian"
+  when: ansible_distribution == "Debian" or ansible_distribution == "CentOS"
   tags:
     - web-server
     - app
