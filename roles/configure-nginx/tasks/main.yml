@@ -79,6 +79,35 @@
       - web-server
       - app
 
+- name: Create /etc/nginx/sites-available/
+  when: ansible_distribution == "CentOS"
+  file: path=/etc/nginx/sites-available/
+        state=directory
+  tags:
+    - web-server
+
+- name: Create /etc/nginx/sites-enabled/
+  when: ansible_distribution == "CentOS"
+  file: path=/etc/nginx/sites-enabled/
+        state=directory
+  tags:
+    - web-server
+
+- name: Ensure /etc/nginx/conf.d/ exists
+  when: ansible_distribution == "CentOS"
+  file:
+        path=/etc/nginx/conf.d/
+        state=directory
+  tags:
+    - web-server
+
+- name: Activate /etc/nginx/sites-enabled/
+  when: ansible_distribution == "CentOS"
+  copy: src=debian-comp.conf
+        dest=/etc/nginx/conf.d/debian-comp.conf
+  tags:
+    - web-server
+
 - name: Install frontend nginx configuration
   template: src=kernelci-frontend.conf
             dest=/etc/nginx/sites-available/{{ hostname }}
