@@ -44,6 +44,13 @@
     - web-server
     - app
 
+- name: Build static assets
+  command: node {{ install_base }}/{{ hostname }}/app/dashboard/static/js/lib/r.js -o {{ install_base }}/{{ hostname }}/app/dashboard/static/js/build.js
+  when: ansible_distribution == "CentOS"
+  tags:
+    - web-server
+    - app
+
 - name: Fix assets permissions
   file: path=/tmp/assets-build
         state=directory
@@ -57,7 +64,7 @@
 
 - name: Copy static assets
   command: rsync -a -u /tmp/assets-build/ {{ web_root }}/{{ hostname }}/static
-  when: ansible_distribution == "Debian"
+  when: ansible_distribution == "Debian" or ansible_distribution == "CentOS"
   tags:
     - web-server
     - app
@@ -71,6 +78,35 @@
   tags:
       - web-server
       - app
+
+- name: Create /etc/nginx/sites-available/
+  when: ansible_distribution == "CentOS"
+  file: path=/etc/nginx/sites-available/
+        state=directory
+  tags:
+    - web-server
+
+- name: Create /etc/nginx/sites-enabled/
+  when: ansible_distribution == "CentOS"
+  file: path=/etc/nginx/sites-enabled/
+        state=directory
+  tags:
+    - web-server
+
+- name: Ensure /etc/nginx/conf.d/ exists
+  when: ansible_distribution == "CentOS"
+  file:
+        path=/etc/nginx/conf.d/
+        state=directory
+  tags:
+    - web-server
+
+- name: Activate /etc/nginx/sites-enabled/
+  when: ansible_distribution == "CentOS"
+  copy: src=debian-comp.conf
+        dest=/etc/nginx/conf.d/debian-comp.conf
+  tags:
+    - web-server
 
 - name: Install frontend nginx configuration
   template: src=kernelci-frontend.conf
@@ -115,6 +151,7 @@
     - web-server
 
 - name: Install uwsgi configuration file
+  when: ansible_distribution == "Debian"
   template: src=kernelci-frontend.ini
             dest=/etc/uwsgi/apps-available/kernelci-frontend.ini
             owner=root
@@ -126,11 +163,24 @@
     - web-server
 
 - name: Enable uwsgi frontend application
+  when: ansible_distribution == "Debian"
   file: state=link
         src=/etc/uwsgi/apps-available/kernelci-frontend.ini
         dest=/etc/uwsgi/apps-enabled/kernelci-frontend.ini
         owner=root
         group=root
+  notify:
+    - reload-uwsgi
+  tags:
+    - web-server
+
+- name: Enable uwsgi frontend application
+  when: ansible_distribution == "CentOS"
+  template: src=kernelci-frontend.ini
+                dest=/etc/uwsgi.d/kernelci-frontend.ini
+        owner={{ app_user }}
+        group={{ app_user }}
+        mode=0640
   notify:
     - reload-uwsgi
   tags:
