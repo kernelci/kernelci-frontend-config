@@ -257,3 +257,13 @@
   tags:
       - https
       - web-server
+
+- name: Enable uwsgi systemd service
+  command:  /bin/systemctl enable uwsgi.service
+            creates=/etc/systemd/system/multi-user.target.wants/uwsgi.service
+  when: ansible_distribution == "Debian" or ansible_distribution == "CentOS"
+  notify:
+    - reload-systemd
+  tags:
+    - init
+    - systemd
