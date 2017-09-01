@@ -9,29 +9,58 @@ The architecture of kernelCI is split into three main components:
 * Frontend
 * Backend
 
-For more information on the architecture please visit:  http://wiki.kernelci.org/
+For more information on the architecture please visit: http://wiki.kernelci.org/
 
 ## Prerequisites
 
-* The host machine which will run the ansible scripts to remotely install the front end onto the target machine. 
-	* Git tools
-	* Ansible >= 2.0: http://docs.ansible.com/ansible/latest/intro_installation.html
-* The target machine where the kernelci infrastructure (front and/or back end) will be deployed 
-	* Supported OS: Debian (Jessie)
-	* ssh root access to the server
-	* Python >= 2.7.12
+Two machines:
+* The host machine which will run the ansible scripts to remotely install the back end onto the target machine.
+	* Host configuration prerequisites
+		* Git tools
+		* Ansible >= 2.0: http://docs.ansible.com/ansible/latest/intro_installation.html
+* The target machine where the kernelci infrastructure (front and back end) will be deployed
+	* Target configuration prerequisites
+		* Supported OS: Debian (Jessie and after), Centos >= 7
+		* ssh root access to the server
+		* Python >= 2.7.12
+
+* Ansible need to have a way to be root either with direct root connect or either with user+sudo/su, you need to choose which way will be used.
+	* For direct root access:
+		* add ansible_ssh_user=root after serverhostname in hosts
+	* For user+sudo
+		* add ansible_ssh_user=user become_method=sudo after serverhostname in hosts
+	* More informations on http://docs.ansible.com/ansible/latest/become.html
 
 ## Installing
 
+### Install order
+* You need to install the [backend first](http://github.com/kernelci/kernelci-backend-config/)
+* Then you need to generate tokens for frontend and set them in secrets.yml
+* Then install the [frontend](http://github.com/kernelci/kernelci-frontend-config/)
+
 ### Get the source code
 ```
-$ git clone https://github.com/kernelci/kernelci-frontend-config.git
+For Deploying kernelci-frontend
+git clone https://github.com/kernelci/kernelci-frontend-config.git
 ```
 
 ### Configure Host
-Edit /etc/hosts - add new line:
+* You need to choose the FQDN used for calling both the frontend and backend.
+  These FQDN must be set in the hostname variable. (default from group_vars/all is kernelci-frontend/kernelci-backend)
+  Thoses name could be different from the hostname of the host.
+
+* then add the choosen hostname in the hosts file
+	* Example:
 ```
-<TARGET_IP> <TARGET_NAME>
+[dev]
+#this machine will be managed directly via root
+kernelci.mydns.com ansible_ssh_user=root
+[rec]
+#this machine will be managed via the user admin becoming root via "su"
+kernelci.mydns.com ansible_ssh_user=admin become_method=su
+[prod]
+#this machine will be managed via the user admin using sudo
+kernelci.mydns.com ansible_ssh_user=admin become_method=sudo
 ```
 
 ### Create secrets.yml file
@@ -49,22 +78,30 @@ To skip the secrets taks, just pass:
 
 The secret keys that have to be defined are:
 
-* backend_url
-* base_url
-* backend_token
-* secret_key
-* info_email
-* ssl_stapling_resolver
-* google_analytics
+* backend_url: The URL for requesting the backend. Ex: http://kernelci-backend/
+* base_url: The URL for requesting the frontend. Ex: http://kernelci-frontend/
+* backend_token: A GET+POST token. (See Manual tasks below for generating this token)
+* secret_key:  should be set to a random string, it is used internally by Flask.
+* master_key: The password used for generating tokens before any admin token was created (See Manual tasks below).
+* info_email: email address to be displayed for contact informations
+* ssl_stapling_resolver: (optionnal)
+* google_analytics: A google_analytics ID (optionnal)
 
-
-The `secret_key` value should be set to a random string, it is used internally
-by Flask.
 
 Other non-secrets variable might need to be defined, please look at the `templates` directories.
 
 ### Run Ansible
 ```
-$ cd <front-end-diretory>
+$ cd <kernelci-frontend-diretory>
 $ ansible-playbook -i hosts site.yml -e "@../secrets.yml" -l <$TARGET_NAME> 
 ```
+
+This will deploy the kernel-ci frontend code into `/srv/$hostname`,
+intall all dependencies and set up an nginx host called `$hostname`.
+
+### Requirements
+
+Non exhaustive list of requirements is in the 'requirements.txt' file: those
+need to be installed via pip.
+For production, requirements.txt is sufficient. For development purpose, requirements-dev.txt
+will add extra package for testing.
