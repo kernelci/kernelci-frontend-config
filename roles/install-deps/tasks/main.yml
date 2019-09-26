@@ -1,19 +1,20 @@
 ---
 - name: Install OS dependencies
   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
-  apt:  pkg={{ item }}
-        state=latest
-        update_cache=yes
-  with_items:
-    - build-essential
-    - git
-    - python-pip
-    - python-apt
-    - python2.7-dev
-    - python-virtualenv
-    - uwsgi
-    - uwsgi-plugin-python
-    - nodejs
+  apt:  
+    pkg: [
+      'build-essential',
+      'git',
+      'python-pip',
+      'python-apt',
+      'python2.7-dev',
+      'python-virtualenv',
+      'uwsgi',
+      'uwsgi-plugin-python',
+      'nodejs'
+    ]
+    state: latest
+    update_cache: yes
   tags:
     - install
 
@@ -33,16 +34,17 @@
 
 - name: Install OS deps
   when: ansible_distribution == "CentOS"
-  yum: name={{ item }}
-  with_items:
-    - git
-    - libselinux-python
-    - python-virtualenv
-    - gcc
-    - rsync
-    - nodejs
-    - uwsgi
-    - uwsgi-plugin-python
+  yum: 
+    name: [
+      'git',
+      'libselinux-python',
+      'python-virtualenv',
+      'gcc',
+      'rsync',
+      'nodejs',
+      'uwsgi', 
+      'uwsgi-plugin-python'
+    ]
   tags:
     - install
 
@@ -52,19 +54,21 @@
 
 - name: Install nginx
   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
-  apt:  pkg={{ item }}
-        state=latest
-        update_cache=yes
-  with_items:
-    - nginx
-    - nginx-extras
-    - rsync
+  apt:  
+    pkg: [
+      'nginx', 
+      'nginx-extras',
+      'rsync'
+    ]
+    state: latest
+    update_cache: yes
   tags:
     - install
 
 - name: Install nginx
   when: ansible_distribution == "CentOS"
-  yum: name=nginx
+  yum: 
+    name: nginx
   tags:
     - install
 
