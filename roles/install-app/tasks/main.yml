@@ -40,8 +40,8 @@
     - install
     - app
 
-- name: Create /etc/linaro/
-  file: path=/etc/linaro/
+- name: Create /etc/kernelci/
+  file: path=/etc/kernelci/
         state=directory
         owner=root
         group=root
@@ -52,7 +52,7 @@
 
 - name: Copy app settings file
   template: src=flask_settings
-            dest=/etc/linaro/kernelci-frontend.cfg
+            dest=/etc/kernelci/kernelci-frontend.cfg
             owner=root
             group=root
             mode=0644
