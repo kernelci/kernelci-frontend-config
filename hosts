@@ -5,7 +5,7 @@ kernelci-frontend
 staging.kernelci.org
 
 [prod]
-kernelci.org
+linux.kernelci.org
 
 [all:children]
 prod

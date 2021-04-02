@@ -1,4 +1,0 @@
-hostname: kernelci.org
-role: production
-uwsgi_processes: 12
-certname: www.kernelci.org
