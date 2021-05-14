@@ -1,0 +1,4 @@
+hostname: chromeos.kernelci.org
+role: production
+uwsgi_processes: 4
+certname: kernelci.org
