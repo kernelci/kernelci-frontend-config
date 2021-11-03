@@ -1,8 +1,8 @@
 ---
+- include: sysctl.yml
 - include: apache.yml
 - include: nginx.yml
 - include: uwsgi.yml
-- include: sysctl.yml
 
 - name: reload-systemd
   command: /bin/systemctl daemon-reload

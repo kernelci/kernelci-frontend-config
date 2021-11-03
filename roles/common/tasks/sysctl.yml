@@ -9,3 +9,6 @@
     - reload-sysctl
   tags:
     - sysctl
+
+- name: Load new sysctl values
+  command: /sbin/sysctl -p
