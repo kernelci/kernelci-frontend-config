@@ -1,0 +1,4 @@
+hostname: chromeos.staging.kernelci.org
+role: production
+uwsgi_processes: 4
+certname: staging.kernelci.org

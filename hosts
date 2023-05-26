@@ -4,6 +4,9 @@ kernelci-frontend
 [dev]
 staging.kernelci.org
 
+[chromeos-staging]
+chromeos.staging.kernelci.org
+
 [prod]
 linux.kernelci.org
 
