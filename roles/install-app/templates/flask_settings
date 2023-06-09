@@ -9,7 +9,7 @@ SECRET_KEY = '{{ secret_key }}'
 # Add the trailing slash!
 FILE_SERVER_URL = '{{ file_server }}'
 GOOGLE_ANALYTICS_ID = '{{ google_analytics }}'
-DATE_RANGE = 14
+DATE_RANGE = 5
 INFO_EMAIL = '{{ info_email }}'
 
 CACHE_TYPE = 'redis'
